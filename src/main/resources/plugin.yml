@@ -1,0 +1,5 @@
+name: WanderingMerchants
+author: Arcamere
+version: '${version}'
+main: com.arcamere.wanderingmerchants.WanderingMerchants
+api-version: '1.20'
