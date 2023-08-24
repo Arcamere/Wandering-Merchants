@@ -3,3 +3,10 @@ author: Arcamere
 version: '${version}'
 main: com.arcamere.wanderingmerchants.WanderingMerchants
 api-version: '1.20'
+depend:
+  - kotlin-stdlib
+  - PlayerNPC
+commands:
+  wanderingmerchants:
+    description: Wandering Merchants command
+    usage: /<command>
