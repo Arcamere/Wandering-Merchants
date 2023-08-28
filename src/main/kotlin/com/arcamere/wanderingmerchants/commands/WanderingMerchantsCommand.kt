@@ -1,6 +1,8 @@
 package com.arcamere.wanderingmerchants.commands
 
 import com.arcamere.wanderingmerchants.WanderingMerchants
+import com.arcamere.wanderingmerchants.location.MerchantLocation
+import com.arcamere.wanderingmerchants.location.MerchantLocationMap
 import com.arcamere.wanderingmerchants.merchant.Merchant
 import org.bukkit.Location
 import org.bukkit.command.Command
@@ -17,7 +19,7 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
 
         return when (args[0]) {
             "shuffle" -> {
-                val lastLocation = HashMap<Merchant, Location>()
+                val lastLocation = HashMap<Merchant, MerchantLocation>()
                 for (merchant in plugin.merchants) {
                     if (merchant.location == null) {
                         continue
@@ -26,7 +28,7 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
                     merchant.location = null
                 }
 
-                val availableLocations = plugin.locations.clone() as ArrayList<Location>
+                val availableLocations = plugin.locations.clone()
 
                 for (merchant in plugin.merchants.shuffled()) {
                     var location = availableLocations.random()
@@ -36,7 +38,6 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
                     merchant.location = location
                     availableLocations.remove(location)
 
-                    println(availableLocations.size)
                     if (availableLocations.size == 0) {
                         return true
                     }
@@ -46,7 +47,8 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
             }
             "addloc" -> {
                 if (sender is Player) {
-                    plugin.locations.add(sender.location)
+                    plugin.locations.add(
+                            MerchantLocation(args[1], sender.location))
                     sender.sendMessage("Added location.")
                     true
                 } else {
