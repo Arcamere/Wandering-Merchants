@@ -20,12 +20,17 @@ repositories {
         name = "ranull-repo-external"
         url = "https://repo.ranull.com/maven/external/"
     }
+    maven {
+        name = "jitpack"
+        url = "https://jitpack.io"
+    }
 }
 
 dependencies {
     compileOnly "io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT"
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compileOnly "dev.sergiferry:playernpc:2023.4"
+    compileOnly "com.github.MilkBowl:VaultAPI:1.7"
 }
 
 def targetJavaVersion = 17
