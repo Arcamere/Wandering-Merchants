@@ -2,9 +2,8 @@ package com.arcamere.wanderingmerchants.commands
 
 import com.arcamere.wanderingmerchants.WanderingMerchants
 import com.arcamere.wanderingmerchants.location.MerchantLocation
-import com.arcamere.wanderingmerchants.location.MerchantLocationMap
 import com.arcamere.wanderingmerchants.merchant.Merchant
-import org.bukkit.Location
+import com.arcamere.wanderingmerchants.npc.NpcLibDriver
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -45,16 +44,95 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
                 sender.sendMessage("Shuffled merchants.")
                 true
             }
-            "addloc" -> {
-                if (sender is Player) {
-                    plugin.locations.add(
-                            MerchantLocation(args[1], sender.location))
-                    sender.sendMessage("Added location.")
-                    true
-                } else {
-                    sender.sendMessage("You must be a player to use this command.")
-                    false
+            "locations" -> {
+                if (args.size == 1) {
+                    sender.sendMessage("Available commands: " +
+                            "* /wm locations list\n" +
+                            "* /wm locations add <name>")
+                    return true
                 }
+                when (args[1]) {
+                    "list" -> {
+                        sender.sendMessage("There are ${plugin.locations.size} locations defined")
+                        for (location in plugin.locations) {
+                            sender.sendMessage("* ${location.value.name}")
+                        }
+                        true
+                    }
+                    "add" -> {
+                        if (args.size == 2) {
+                            sender.sendMessage("Incorrect usage, correct usage is /wm locations add <name>")
+                            false
+                        }
+                        if (sender is Player) {
+                            plugin.locations.add(
+                                MerchantLocation(args[2], sender.location))
+                            sender.sendMessage("Added location.")
+                            true
+                        } else {
+                            sender.sendMessage("You must be a player to use this command.")
+                            false
+                        }
+                    }
+                    else -> {
+                        false
+                    }
+                }
+            }
+            "merchants" -> {
+                if (args.size == 1) {
+                    sender.sendMessage("Available commands: " +
+                            "* /wm merchants list\n" +
+                            "* /wm merchants add <name>\n" +
+                            "* /wm merchants remove <name>")
+                    return true
+                }
+                when (args[1]) {
+                    "list" -> {
+                        var merchantCount = 0
+                        for (merchant in plugin.merchants) {
+                            if (merchant.location != null) {
+                                merchantCount += 1
+                            }
+                        }
+                        sender.sendMessage("There are $merchantCount/${plugin.merchants.size} merchants deployed")
+                        for(merchant in plugin.merchants) {
+                            sender.sendMessage("* ${merchant.name}: ${merchant.location?.name ?: "Undeployed"}")
+                        }
+                        true
+                    }
+                    "add" -> {
+                        if (args.size == 2) {
+                            sender.sendMessage("Incorrect usage, correct usage is /wm merchants add <name>")
+                            false
+                        }
+                        val name = args.sliceArray(2 until args.size).joinToString(" ")
+                        plugin.merchants.add(Merchant(name, NpcLibDriver(plugin, name)))
+                    }
+                    "remove" -> {
+                        if (args.size == 2) {
+                            sender.sendMessage("Incorrect usage, correct usage is /wm merchants remove <name>")
+                            false
+                        }
+                        val name = args.sliceArray(2 until args.size).joinToString(" ").lowercase()
+                        var foundMerchant: Merchant? = null
+                        for (merchant in plugin.merchants) {
+                            // So you can use lowercase variants
+                            if (merchant.name.lowercase() == name) {
+                                foundMerchant = merchant
+                            }
+                        }
+
+                        if (foundMerchant != null) {
+                            plugin.merchants.remove(foundMerchant)
+                            sender.sendMessage("Removed ${foundMerchant.name}")
+                        } else {
+                            sender.sendMessage("Could not find a merchant by that name")
+                        }
+                        true
+                    }
+                }
+                false
             }
             else -> {
                 sender.sendMessage("Unknown command.")
