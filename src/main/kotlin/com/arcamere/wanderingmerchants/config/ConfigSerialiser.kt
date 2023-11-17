@@ -4,11 +4,8 @@ import com.arcamere.wanderingmerchants.WanderingMerchants
 import com.arcamere.wanderingmerchants.location.MerchantLocation
 import com.arcamere.wanderingmerchants.location.MerchantLocationMap
 import com.arcamere.wanderingmerchants.merchant.Merchant
-import com.arcamere.wanderingmerchants.merchant.TradeItem
 import com.arcamere.wanderingmerchants.npc.NpcLibDriver
 import org.bukkit.Bukkit
-import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
 
 class ConfigSerialiser {
     fun serialise(config: Config): Nothing = TODO()
@@ -32,17 +29,8 @@ class ConfigSerialiser {
         config.getList("merchants")?.forEach { it ->
             if (it is LinkedHashMap<*, *>) {
                 val name = it["name"] as String
-                val items = ArrayList<TradeItem>()
-                (it["items"] as List<*>).forEach {
-                    if (it is LinkedHashMap<*, *>) {
-                        items.add(TradeItem(
-                            ItemStack(Material.matchMaterial(it["item"] as String)!!, it["amount"] as Int),
-                            it["price"] as Int
-                        ))
-                    }
-                }
                 val npcDriver = NpcLibDriver(plugin, name)
-                val merchant = Merchant(name, items, npcDriver)
+                val merchant = Merchant(name, npcDriver)
                 merchants.add(merchant)
             }
         }
