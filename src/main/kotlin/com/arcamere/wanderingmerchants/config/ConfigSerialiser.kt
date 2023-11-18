@@ -4,12 +4,14 @@ import com.arcamere.wanderingmerchants.WanderingMerchants
 import com.arcamere.wanderingmerchants.location.MerchantLocation
 import com.arcamere.wanderingmerchants.location.MerchantLocationMap
 import com.arcamere.wanderingmerchants.merchant.Merchant
+import com.arcamere.wanderingmerchants.npc.CommandContext
+import com.arcamere.wanderingmerchants.npc.MerchantCommand
 import com.arcamere.wanderingmerchants.npc.PlayerNpcDriver
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 
 class ConfigSerialiser {
-    fun serialise(plugin: WanderingMerchants, config: Config): YamlConfiguration {
+    fun serialise(config: Config): YamlConfiguration {
         val yaml = YamlConfiguration()
         val locationSectionHeader = yaml.createSection("locations")
         for (location in config.locations) {
@@ -24,9 +26,12 @@ class ConfigSerialiser {
         }
 
         val merchantsSectionHeader = yaml.createSection("merchants")
-        for (merchants in config.merchants) {
-            val merchantSection = merchantsSectionHeader.createSection(merchants.name)
-
+        for (merchant in config.merchants) {
+            val merchantSection = merchantsSectionHeader.createSection(merchant.name)
+            if (merchant.command != null) {
+                merchantSection.set("command", merchant.command.command)
+                merchantSection.set("command_context", merchant.command.commandContext.name)
+            }
         }
 
         return yaml
@@ -51,7 +56,13 @@ class ConfigSerialiser {
             val merchantSection = config.getConfigurationSection("merchants.$it")
             val name = it as String
             val npcDriver = PlayerNpcDriver(plugin, name)
-            val merchant = Merchant(name, npcDriver)
+            val command = if (merchantSection?.contains("command")!!) {
+                MerchantCommand(merchantSection.getString("command")!!,
+                    CommandContext.valueOf(merchantSection.getString("command_context")!!))
+            } else {
+                null
+            }
+            val merchant = Merchant(name, command, npcDriver)
             merchants.add(merchant)
         }
 

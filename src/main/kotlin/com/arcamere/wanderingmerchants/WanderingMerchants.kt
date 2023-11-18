@@ -30,6 +30,6 @@ class WanderingMerchants: JavaPlugin() {
     }
 
     override fun saveConfig() {
-        ConfigSerialiser().serialise(this, Config(merchants, locations)).save(File(this.dataFolder, "config.yml"))
+        ConfigSerialiser().serialise(Config(merchants, locations)).save(File(this.dataFolder, "config.yml"))
     }
 }
