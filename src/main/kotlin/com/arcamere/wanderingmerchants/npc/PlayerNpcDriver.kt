@@ -5,7 +5,7 @@ import com.arcamere.wanderingmerchants.location.MerchantLocation
 import dev.sergiferry.playernpc.api.NPC
 import dev.sergiferry.playernpc.api.NPCLib
 
-class NpcLibDriver(private val plugin: WanderingMerchants, private val merchantName: String): NpcDriver {
+class PlayerNpcDriver(private val plugin: WanderingMerchants, private val merchantName: String): NpcDriver {
     private var npc: NPC.Global? = null
     private var location: MerchantLocation? = null
     override fun create(location: MerchantLocation) {

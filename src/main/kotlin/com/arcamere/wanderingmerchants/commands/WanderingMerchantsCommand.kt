@@ -3,7 +3,7 @@ package com.arcamere.wanderingmerchants.commands
 import com.arcamere.wanderingmerchants.WanderingMerchants
 import com.arcamere.wanderingmerchants.location.MerchantLocation
 import com.arcamere.wanderingmerchants.merchant.Merchant
-import com.arcamere.wanderingmerchants.npc.NpcLibDriver
+import com.arcamere.wanderingmerchants.npc.PlayerNpcDriver
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -108,7 +108,7 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
                             false
                         }
                         val name = args.sliceArray(2 until args.size).joinToString(" ")
-                        plugin.merchants.add(Merchant(name, NpcLibDriver(plugin, name)))
+                        plugin.merchants.add(Merchant(name, PlayerNpcDriver(plugin, name)))
                         plugin.saveConfig()
                     }
                     "remove" -> {

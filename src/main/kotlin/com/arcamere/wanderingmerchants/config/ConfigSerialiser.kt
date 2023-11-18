@@ -4,7 +4,7 @@ import com.arcamere.wanderingmerchants.WanderingMerchants
 import com.arcamere.wanderingmerchants.location.MerchantLocation
 import com.arcamere.wanderingmerchants.location.MerchantLocationMap
 import com.arcamere.wanderingmerchants.merchant.Merchant
-import com.arcamere.wanderingmerchants.npc.NpcLibDriver
+import com.arcamere.wanderingmerchants.npc.PlayerNpcDriver
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 
@@ -50,7 +50,7 @@ class ConfigSerialiser {
         config.getConfigurationSection("merchants")?.getKeys(false)?.forEach { it ->
             val merchantSection = config.getConfigurationSection("merchants.$it")
             val name = it as String
-            val npcDriver = NpcLibDriver(plugin, name)
+            val npcDriver = PlayerNpcDriver(plugin, name)
             val merchant = Merchant(name, npcDriver)
             merchants.add(merchant)
         }
