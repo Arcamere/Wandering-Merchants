@@ -3,6 +3,8 @@ package com.arcamere.wanderingmerchants.commands
 import com.arcamere.wanderingmerchants.WanderingMerchants
 import com.arcamere.wanderingmerchants.location.MerchantLocation
 import com.arcamere.wanderingmerchants.merchant.Merchant
+import com.arcamere.wanderingmerchants.npc.CommandContext
+import com.arcamere.wanderingmerchants.npc.MerchantCommand
 import com.arcamere.wanderingmerchants.npc.PlayerNpcDriver
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -108,7 +110,9 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
                             false
                         }
                         val name = args.sliceArray(2 until args.size).joinToString(" ")
-                        plugin.merchants.add(Merchant(name, PlayerNpcDriver(plugin, name)))
+                        plugin.merchants.add(Merchant(name, MerchantCommand(
+                            "Set the command for the merchant to execute here",
+                            CommandContext.AS_CONSOLE), PlayerNpcDriver(plugin, name)))
                         plugin.saveConfig()
                     }
                     "remove" -> {
@@ -133,6 +137,35 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
                             sender.sendMessage("Could not find a merchant by that name")
                         }
                         true
+                    }
+                    "tp" -> {
+                        if (args.size == 2) {
+                            sender.sendMessage("Incorrect usage, correct usage is /wm merchants tp <name>")
+                            return false
+                        }
+                        if (sender !is Player) {
+                            sender.sendMessage("You need to be a player to teleport mate")
+                            return false
+                        }
+                        val name = args.sliceArray(2 until args.size).joinToString(" ").lowercase()
+                        var foundMerchant: Merchant? = null
+                        for (merchant in plugin.merchants) {
+                            // So you can use lowercase variants
+                            if (merchant.name.lowercase() == name) {
+                                foundMerchant = merchant
+                            }
+                        }
+
+                        if (foundMerchant != null) {
+                            if (foundMerchant.location == null) {
+                                sender.sendMessage("This merchant has not been deployed")
+                                return false
+                            }
+                            sender.teleport(foundMerchant.location!!.toLocation())
+                        } else {
+                            sender.sendMessage("Could not find a merchant by that name")
+                        }
+
                     }
                 }
                 false
