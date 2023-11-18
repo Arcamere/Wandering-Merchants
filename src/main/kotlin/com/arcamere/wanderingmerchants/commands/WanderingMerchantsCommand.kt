@@ -68,6 +68,7 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
                             plugin.locations.add(
                                 MerchantLocation(args[2], sender.location))
                             sender.sendMessage("Added location.")
+                            plugin.saveConfig()
                             true
                         } else {
                             sender.sendMessage("You must be a player to use this command.")
@@ -108,6 +109,7 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
                         }
                         val name = args.sliceArray(2 until args.size).joinToString(" ")
                         plugin.merchants.add(Merchant(name, NpcLibDriver(plugin, name)))
+                        plugin.saveConfig()
                     }
                     "remove" -> {
                         if (args.size == 2) {
@@ -125,6 +127,7 @@ class WanderingMerchantsCommand(private val plugin: WanderingMerchants): Command
 
                         if (foundMerchant != null) {
                             plugin.merchants.remove(foundMerchant)
+                            plugin.saveConfig()
                             sender.sendMessage("Removed ${foundMerchant.name}")
                         } else {
                             sender.sendMessage("Could not find a merchant by that name")

@@ -6,33 +6,53 @@ import com.arcamere.wanderingmerchants.location.MerchantLocationMap
 import com.arcamere.wanderingmerchants.merchant.Merchant
 import com.arcamere.wanderingmerchants.npc.NpcLibDriver
 import org.bukkit.Bukkit
+import org.bukkit.configuration.file.YamlConfiguration
 
 class ConfigSerialiser {
-    fun serialise(config: Config): Nothing = TODO()
+    fun serialise(plugin: WanderingMerchants, config: Config): YamlConfiguration {
+        val yaml = YamlConfiguration()
+        val locationSectionHeader = yaml.createSection("locations")
+        for (location in config.locations) {
+            val locationSection = locationSectionHeader.createSection(location.value.name)
+            locationSection.set("name", location.value.name)
+            locationSection.set("world", location.value.world.name)
+            locationSection.set("x", location.value.x)
+            locationSection.set("y", location.value.y)
+            locationSection.set("z", location.value.z)
+            locationSection.set("yaw", location.value.yaw)
+            locationSection.set("pitch", location.value.pitch)
+        }
+
+        val merchantsSectionHeader = yaml.createSection("merchants")
+        for (merchants in config.merchants) {
+            val merchantSection = merchantsSectionHeader.createSection(merchants.name)
+
+        }
+
+        return yaml
+    }
     fun deserialise(plugin: WanderingMerchants): Config {
         val config = plugin.getConfig()
         val locations = MerchantLocationMap()
         val merchants = ArrayList<Merchant>()
-        config.getList("locations")?.forEach {
-            if (it is LinkedHashMap<*, *>) {
-                locations[it["name"] as String] = MerchantLocation(
-                    it["name"] as String,
-                    Bukkit.getWorld(it["world"] as String)!!,
-                    (it["x"] as Int).toDouble(),
-                    (it["y"] as Int).toDouble(),
-                    (it["z"] as Int).toDouble(),
-                    (it["yaw"] as Int? ?: 0).toFloat(),
-                    (it["pitch"] as Int? ?: 0).toFloat()
-                )
-            }
+        config.getConfigurationSection("locations")?.getKeys(false)?.forEach {
+            val locationSection = config.getConfigurationSection("locations.$it")
+            locations[it] = MerchantLocation(
+                locationSection?.getString("name")!!,
+                Bukkit.getWorld(locationSection.getString("world")!!)!!,
+                locationSection.getDouble("x"),
+                locationSection.getDouble("y"),
+                locationSection.getDouble("z"),
+                locationSection.getDouble("yaw").toFloat(),
+                locationSection.getDouble("pitch").toFloat()
+            )
         }
-        config.getList("merchants")?.forEach { it ->
-            if (it is LinkedHashMap<*, *>) {
-                val name = it["name"] as String
-                val npcDriver = NpcLibDriver(plugin, name)
-                val merchant = Merchant(name, npcDriver)
-                merchants.add(merchant)
-            }
+        config.getConfigurationSection("merchants")?.getKeys(false)?.forEach { it ->
+            val merchantSection = config.getConfigurationSection("merchants.$it")
+            val name = it as String
+            val npcDriver = NpcLibDriver(plugin, name)
+            val merchant = Merchant(name, npcDriver)
+            merchants.add(merchant)
         }
 
         return Config(merchants, locations)
