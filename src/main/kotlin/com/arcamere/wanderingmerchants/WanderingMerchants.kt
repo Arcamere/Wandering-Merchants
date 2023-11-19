@@ -13,6 +13,7 @@ import java.io.File
 class WanderingMerchants: JavaPlugin() {
     var merchants = ArrayList<Merchant>()
     var locations = MerchantLocationMap()
+    var merchantCap = 0
     override fun onEnable() {
         // Plugin startup logic
         this.saveDefaultConfig()
@@ -20,6 +21,7 @@ class WanderingMerchants: JavaPlugin() {
         val config = ConfigSerialiser().deserialise(this)
         this.merchants = config.merchants
         this.locations = config.locations
+        this.merchantCap = config.merchantCap
 
         NPCLib.getInstance().registerPlugin(this)
         this.getCommand("wanderingmerchants")?.setExecutor(WanderingMerchantsCommand(this))
@@ -33,7 +35,7 @@ class WanderingMerchants: JavaPlugin() {
     }
 
     override fun saveConfig() {
-        ConfigSerialiser().serialise(Config(merchants, locations)).save(File(this.dataFolder, "config.yml"))
+        ConfigSerialiser().serialise(Config(merchants, locations, merchantCap)).save(File(this.dataFolder, "config.yml"))
     }
 
     fun shuffleMerchants() {
@@ -56,7 +58,7 @@ class WanderingMerchants: JavaPlugin() {
             merchant.location = location
             availableLocations.remove(location)
 
-            if (availableLocations.size == 0) {
+            if (availableLocations.size == 0 || availableLocations.size == (merchants.size - merchantCap)) {
                 return
             }
         }

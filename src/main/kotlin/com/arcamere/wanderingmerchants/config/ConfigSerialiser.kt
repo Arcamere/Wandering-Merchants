@@ -34,6 +34,9 @@ class ConfigSerialiser {
             }
         }
 
+        val generalSectionHeader = yaml.createSection("general")
+        generalSectionHeader.set("merchant_cap", config.merchantCap)
+
         return yaml
     }
     fun deserialise(plugin: WanderingMerchants): Config {
@@ -65,7 +68,8 @@ class ConfigSerialiser {
             val merchant = Merchant(name, command, npcDriver)
             merchants.add(merchant)
         }
+        val merchantCap = config.getInt("general.merchant_cap", Int.MAX_VALUE)
 
-        return Config(merchants, locations)
+        return Config(merchants, locations, merchantCap)
     }
 }
