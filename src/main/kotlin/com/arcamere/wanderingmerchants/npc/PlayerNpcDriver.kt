@@ -36,6 +36,7 @@ class PlayerNpcDriver(private val plugin: WanderingMerchants,
     }
 
     override fun destroy() {
+        this.location = null
         if (this.npc == null) {
             return
         }
